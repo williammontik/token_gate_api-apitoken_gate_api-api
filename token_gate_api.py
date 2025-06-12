@@ -6,7 +6,8 @@ import sqlite3, os
 app = Flask(__name__)
 CORS(app)
 
-DB_FILE = "coupon.db"
+# ✅ Store DB on Render persistent disk
+DB_FILE = "/mnt/data/coupon.db"
 ADMIN_PASS = os.getenv("COUPON_ADMIN_PASS", "super2121")  # from .env
 
 def init_db():
@@ -26,9 +27,8 @@ init_db()
 def validate_coupon():
     data = request.get_json()
     code = data.get("coupon", "").strip()
-    lang = data.get("lang", "en").lower()  # default to English if not specified
+    lang = data.get("lang", "en").lower()
 
-    # Multilingual error messages
     MESSAGES = {
         "en": {
             "invalid": "❌ Invalid code.",
@@ -100,7 +100,7 @@ def coupon_api():
 
     elif request.method == "POST":
         data = request.get_json()
-        code = data.get("code", "").strip().upper()  # normalize code
+        code = data.get("code", "").strip().upper()
         max_uses = int(data.get("max_uses", 5))
         if not code:
             return jsonify({"error": "Missing code"}), 400
